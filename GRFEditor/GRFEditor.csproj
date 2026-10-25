@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -11,6 +12,8 @@
     <RootNamespace>GRFEditor</RootNamespace>
     <AssemblyName>GRF Editor</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -1047,6 +1050,33 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\gat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="10.0.1" GeneratePathProperty="true" />
+    <PackageReference Include="System.Memory" Version="4.6.3" GeneratePathProperty="true" />
+    <PackageReference Include="System.Buffers" Version="4.6.1" GeneratePathProperty="true" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.6.1" GeneratePathProperty="true" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" GeneratePathProperty="true" />
+    <Reference Include="System.IO.Hashing">
+      <HintPath>$(PkgSystem_IO_Hashing)\lib\net462\System.IO.Hashing.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>$(PkgSystem_Memory)\lib\net462\System.Memory.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>$(PkgSystem_Buffers)\lib\net462\System.Buffers.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>$(PkgSystem_Numerics_Vectors)\lib\net462\System.Numerics.Vectors.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>$(PkgSystem_Runtime_CompilerServices_Unsafe)\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -12,6 +12,7 @@ using Utilities.Services;
 namespace GRF.Core {
 	public sealed class FileEntry : ContainerEntry, INotifyPropertyChanged {
 		private GrfHeader _header;
+		private byte[] _originalPathBytes;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileEntry" /> class.
@@ -26,6 +27,7 @@ namespace GRF.Core {
 		/// </summary>
 		/// <param name="entry">The entry.</param>
 		internal FileEntry(FileEntry entry) {
+			_originalPathBytes = entry._originalPathBytes;
 			RelativePath = entry.RelativePath;
 			SizeCompressed = entry.SizeCompressed;
 			SizeCompressedAlignment = entry.SizeCompressedAlignment;
@@ -62,6 +64,8 @@ namespace GRF.Core {
 				endCharPosition++;
 			}
 
+			_originalPathBytes = new byte[endCharPosition - offset];
+			Buffer.BlockCopy(data, offset, _originalPathBytes, 0, _originalPathBytes.Length);
 			_relativePath = EncodingService.DisplayEncoding.GetString(data, offset, endCharPosition - offset).Replace("/", "\\");
 
 			if (_relativePath.IndexOf('?', 0, _relativePath.Length) > -1) {
@@ -268,7 +272,7 @@ namespace GRF.Core {
 		}
 
 		protected override byte[] _getDecompressedData() {
-			if (NewSizeDecompressed == 0)
+			if (NewSizeDecompressed == 0 && !Flags.HasFlag(EntryType.GravityEncryptedFile))
 				return new byte[] {};
 
 			byte[] data;
@@ -281,8 +285,17 @@ namespace GRF.Core {
 			if (BypassSaveCheck)
 				BypassSaveCheck = false;
 
-			if (Flags.HasFlag(EntryType.GravityEncryptedFile))
-				throw GrfExceptions.__GravityEncryptedFile.Create(RelativePath);
+			if (Flags.HasFlag(EntryType.GravityEncryptedFile)) {
+				if (_originalPathBytes == null)
+					throw new InvalidDataException("Original archive path bytes are unavailable for Gravity resource decryption.");
+				if (SizeCompressed < 104 || SizeCompressed > SizeCompressedAlignment)
+					throw new InvalidDataException("Invalid Gravity resource stored size.");
+				lock (Stream.SharedLock) {
+					Stream.PositionLong = FileExactOffset;
+					data = Stream.Bytes(SizeCompressed);
+				}
+				return GravityResourceDecryptor.DecryptResource(data, _originalPathBytes, SizeDecompressed);
+			}
 
 			lock (Stream.SharedLock) {
 				Stream.PositionLong = FileExactOffset;

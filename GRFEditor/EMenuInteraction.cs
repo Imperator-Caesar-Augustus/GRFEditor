@@ -44,7 +44,7 @@ namespace GRFEditor {
 
 		private void _menuItemOpenFrom_Click(object sender, RoutedEventArgs e) {
 			try {
-				string file = PathRequest.OpenFileEditor("filter", FileFormat.MergeFilters(FileFormat.AllContainers, FileFormat.Grf, FileFormat.Gpf, FileFormat.Rgz, FileFormat.Thor));
+				string file = PathRequest.OpenFileEditor("filter", FileFormat.MergeFilters(FileFormat.AllContainers, FileFormat.Grf, FileFormat.Gpf, FileFormat.Rgz, FileFormat.Thor, FileFormat.Gsf));
 				if (file != null) {
 					if (File.Exists(file)) {
 						_recentFilesManager.AddRecentFile(file);
