@@ -294,7 +294,7 @@ namespace GRF.Core {
 					Stream.PositionLong = FileExactOffset;
 					data = Stream.Bytes(SizeCompressed);
 				}
-				return GravityResourceDecryptor.DecryptResource(data, _originalPathBytes, SizeDecompressed);
+				return DecodeGravityData(data);
 			}
 
 			lock (Stream.SharedLock) {
@@ -355,6 +355,18 @@ namespace GRF.Core {
 			}
 
 			return Compression.Decompress(data, SizeDecompressed);
+		}
+
+		internal byte[] DecodeGravityData(byte[] storedData) {
+			if (_originalPathBytes == null || SizeCompressed < 104 ||
+			    SizeCompressed > SizeCompressedAlignment || storedData.Length < SizeCompressed)
+				throw new InvalidDataException("Invalid or truncated Gravity resource: " + RelativePath);
+			if (storedData.Length != SizeCompressed) {
+				var exactData = new byte[SizeCompressed];
+				Buffer.BlockCopy(storedData, 0, exactData, 0, exactData.Length);
+				storedData = exactData;
+			}
+			return GravityResourceDecryptor.DecryptResource(storedData, _originalPathBytes, SizeDecompressed);
 		}
 
 		protected override byte[] _getCompressedData() {

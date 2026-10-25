@@ -66,6 +66,23 @@ namespace GRFEditor {
 		private void _menuItemTableEncrypt_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.TableEncrypt);
 		private void _menuItemSaveAs_Click(object sender, RoutedEventArgs e) => _save(GrfEditorSaveMode.SaveAs);
 
+		private void _menuItemSaveDecryptedGpf_Click(object sender, RoutedEventArgs e) {
+			try {
+				if (!_grfHolder.IsOpened) return;
+				if (_grfHolder.IsBusy || _asyncOperation.IsRunning)
+					throw new InvalidOperationException("An operation is already running.");
+				string file = PathRequest.SaveFileEditor("filter", FileFormat.Gpf.ToFilter(),
+					"fileName", Path.GetFileNameWithoutExtension(_grfHolder.FileName) + ".gpf");
+				if (file == null) return;
+				var source = _grfHolder;
+				_asyncOperation.SetAndRunOperation(new GrfThread(() => {
+					try { DecryptedGpfExporter.Export(source, file); }
+					catch (OperationCanceledException) { source.IsCancelled = true; }
+				}, source, null, true));
+			}
+			catch (Exception error) { ErrorHandler.HandleException(error); }
+		}
+
 		public enum GrfEditorSaveMode {
 			QuickSave,
 			SaveAs,
